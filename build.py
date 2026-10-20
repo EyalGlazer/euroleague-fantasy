@@ -51,7 +51,7 @@ for r in ws.iter_rows(min_row=2, values_only=True):
     fpt, price, plus = float(r[6]), float(r[7]), float(r[8])
     players.append(dict(name=f"{r[1]} {r[2]}".strip(), pos=r[4], team=r[5], fpt=fpt, price=price, plus=plus,
                         fptpm=round(fpt/price, 3) if price else 0, pluspm=round(plus/price, 3) if price else 0,
-                        rn=LAST, opps=[OPP[n].get(r[5]) for n in LAST], nextopp=TEAMS[NEXT[r[5]][0]][0], nextrank=TEAMS[NEXT[r[5]][0]][1], nextha=NEXT[r[5]][1], nextturn="T%d" % TURN[r[5]],
+                        rn=LAST, opps=[OPP[n].get(r[5]) for n in LAST], nextrn=max(LAST)+1, nextcode=NEXT[r[5]][0], nextopp=TEAMS[NEXT[r[5]][0]][0], nextrank=TEAMS[NEXT[r[5]][0]][1], nextha=NEXT[r[5]][1], nextturn="T%d" % TURN[r[5]],
                         hist=[list(rounds[n][key(r)]) if key(r) in rounds[n] else None for n in LAST]))
 import base64
 logo = "data:image/png;base64," + base64.b64encode(open("euroleague-logo.png","rb").read()).decode()

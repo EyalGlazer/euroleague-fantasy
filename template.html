@@ -109,11 +109,11 @@ $("reset").onclick=()=>{["q","team","pos"].forEach(id=>$(id).value="");resetPric
 render();
 // hover chart: FPT bars + price line over the last rounds
 function chart(p){
- const H=p.hist,n=H.length,W=300,Ht=246,L=36,R=14,T=20,B=58,pw=W-L-R,ph=Ht-T-B;
+ const H=p.hist.concat([null]),RN=p.rn.concat([p.nextrn]),OP=p.opps.concat([[p.nextcode,p.nextha]]),n=H.length,W=300,Ht=246,L=36,R=14,T=20,B=58,pw=W-L-R,ph=Ht-T-B;
  const x=i=>L+pw*(i+.5)/n,base=T+ph;
  const axis=(top,bot)=>`<line x1="${L}" x2="${W-R}" y1="${base}" y2="${base}" stroke="#26304a"/>
   <text x="${L-4}" y="${T+4}" text-anchor="end">${top}</text><text x="${L-4}" y="${base}" text-anchor="end">${bot}</text>`
-  +H.map((_,i)=>`<text x="${x(i)}" y="${Ht-36}" text-anchor="middle" style="fill:#e6ebf5">R${p.rn[i]}</text><text x="${x(i)}" y="${Ht-21}" text-anchor="middle">${p.opps[i][0]}</text><text x="${x(i)}" y="${Ht-6}" text-anchor="middle" style="font-weight:700;fill:${p.opps[i][1]==="H"?"#8be28b":"#ffb86b"}">${p.opps[i][1]}</text>`).join("");
+  +H.map((_,i)=>`<text x="${x(i)}" y="${Ht-36}" text-anchor="middle" style="fill:#e6ebf5">R${RN[i]}</text><text x="${x(i)}" y="${Ht-21}" text-anchor="middle">${OP[i][0]}</text><text x="${x(i)}" y="${Ht-6}" text-anchor="middle" style="font-weight:700;fill:${OP[i][1]==="H"?"#8be28b":"#ffb86b"}">${OP[i][1]}</text>`).join("");
  // FPT bars
  const fm=Math.max(10,...H.map(h=>h?h[0]:0)),yf=v=>base-v/fm*ph;
  let bars=axis(Math.round(fm),0);
@@ -121,11 +121,15 @@ function chart(p){
   bars+=`<rect x="${x(i)-bw/2}" y="${y}" width="${bw}" height="${base-y}" rx="2" fill="#e8eefc"/>
   <text x="${x(i)}" y="${y-3}" text-anchor="middle" style="fill:#fff">${h[0]}</text>`});
  // Price line
- const ps=H.filter(Boolean).map(h=>h[1]);if(!ps.length)ps.push(p.price);let lo=Math.min(...ps),hi=Math.max(...ps);if(hi-lo<0.5){lo-=0.5;hi+=0.5}
+ const ps=H.filter(Boolean).map(h=>h[1]);ps.push(p.price);let lo=Math.min(...ps),hi=Math.max(...ps);if(hi-lo<0.5){lo-=0.5;hi+=0.5}
  const yp=v=>base-(v-lo)/(hi-lo)*ph;
  let line=axis(hi.toFixed(1),lo.toFixed(1));const pts=[];
  H.forEach((h,i)=>{if(h)pts.push([x(i),yp(h[1]),h[1]])});
- if(pts.length)line+=`<polyline points="${pts.map(q=>q[0]+","+q[1]).join(" ")}" fill="none" stroke="#ff4d4d" stroke-width="2"/>`;
+ const nx=[x(n-1),yp(p.price),p.price];  // upcoming round: current price, round not played yet
+ const pl=q=>q.map(z=>z[0]+","+z[1]).join(" ");
+ if(pts.length>1)line+=`<polyline points="${pl(pts)}" fill="none" stroke="#ff4d4d" stroke-width="2"/>`;
+ line+=`<polyline points="${pl(pts.slice(-1).concat([nx]))}" fill="none" stroke="#ff4d4d" stroke-width="2" stroke-dasharray="4 3"/>`;
+ line+=`<circle cx="${nx[0]}" cy="${nx[1]}" r="3.5" fill="#171e2e" stroke="#ff4d4d" stroke-width="2"/><text x="${nx[0]}" y="${nx[1]-8}" text-anchor="middle" style="fill:#ffd0d0">${nx[2]}</text>`;
  pts.forEach(q=>line+=`<circle cx="${q[0]}" cy="${q[1]}" r="3" fill="#ff4d4d"/><text x="${q[0]}" y="${q[1]-7}" text-anchor="middle" style="fill:#ffd0d0">${q[2]}</text>`);
  return `<h4>${p.name} <span style="color:var(--mut);font-weight:400">${p.team}</span></h4>
  <div class="charts"><div><div class="lg"><span><i style="background:#e8eefc"></i>FPT per round</span></div><svg width="${W}" height="${Ht}">${bars}</svg></div>
