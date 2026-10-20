@@ -1,13 +1,14 @@
 import openpyxl, json, sys
 # Standings (rank) and next round fixtures, transcribed from the screenshots (home team listed first)
-TEAMS = {"PAO":("Panathinaikos",1),"VBC":("Valencia Basket",2),"FBT":("Fenerbahçe",3),"OLY":("Olympiacos",4),"CZV":("Crvena zvezda",5),
- "HTA":("Hapoel Tel Aviv",6),"BAR":("Barcelona",7),"PAR":("Partizan",8),"VIR":("Virtus Bologna",9),"DUB":("Dubai",10),
- "RMB":("Real Madrid",11),"BJK":("Beşiktaş",12),"ZAL":("Žalgiris",13),"BAY":("Bayern Munich",14),"ASV":("LDLC ASVEL",15),
- "PBB":("Paris",16),"EFS":("Anadolu Efes",17),"MTA":("Maccabi Tel Aviv",18),"MIL":("Milano",19),"KBA":("Baskonia",20)}
-# Next round (6) fixtures, home first; first 4 games are Turn 1 (15/10), last 6 are Turn 2 (16/10)
-FIXTURES = [("FBT","PAR"),("MIL","DUB"),("VBC","MTA"),("RMB","ASV"),
-            ("BJK","BAY"),("ZAL","EFS"),("CZV","PBB"),("PAO","HTA"),("BAR","OLY"),("VIR","KBA")]
-# Rounds 1-5 fixtures (home first), transcribed from screenshots. Round 4 last game (BAR-ZAL) was cut off in the
+TEAMS = {"PAO":("Panathinaikos",1),"FBT":("Fenerbahçe",2),"OLY":("Olympiacos",3),"VBC":("Valencia Basket",4),"CZV":("Crvena zvezda",5),
+ "HTA":("Hapoel Tel Aviv",6),"VIR":("Virtus Bologna",7),"DUB":("Dubai",8),"RMB":("Real Madrid",9),"BAR":("Barcelona",10),
+ "BJK":("Beşiktaş",11),"PAR":("Partizan",12),"EFS":("Anadolu Efes",13),"ZAL":("Žalgiris",14),"BAY":("Bayern Munich",15),
+ "MTA":("Maccabi Tel Aviv",16),"ASV":("LDLC ASVEL",17),"PBB":("Paris",18),"MIL":("Milano",19),"KBA":("Baskonia",20)}
+# Next round (7) fixtures, home first; 1 game in Turn 1 (21/10), 6 in Turn 2 (22/10), 3 in Turn 3 (23/10)
+FIXTURES = [("HTA","VIR"),
+            ("EFS","BJK"),("BAY","DUB"),("MTA","RMB"),("PAO","KBA"),("MIL","BAR"),("PAR","CZV"),
+            ("ZAL","ASV"),("OLY","FBT"),("PBB","VBC")]
+# Rounds 1-6 fixtures (home first), transcribed from screenshots. Round 4 last game (BAR-ZAL) was cut off in the
 # screenshot and inferred as the two teams not otherwise listed; its home/away order is unknown.
 ROUNDS = {  # round number -> fixtures; add a new entry each round
  1: [("DUB","RMB"),("HTA","BAY"),("CZV","ZAL"),("PAO","PBB"),("BAR","EFS"),("KBA","OLY"),("ASV","MTA"),("BJK","VBC"),("FBT","VIR"),("PAR","MIL")],
@@ -15,6 +16,8 @@ ROUNDS = {  # round number -> fixtures; add a new entry each round
  3: [("HTA","RMB"),("CZV","EFS"),("VIR","OLY"),("PBB","ZAL"),("BJK","BAR"),("FBT","DUB"),("ASV","VBC"),("BAY","PAR"),("PAO","MTA"),("KBA","MIL")],
  4: [("PBB","ASV"),("MTA","MIL"),("DUB","CZV"),("BAY","VIR"),("PAO","FBT"),("VBC","HTA"),("RMB","PAR"),("OLY","EFS"),("KBA","BJK"),("BAR","ZAL",None)],
  5: [("FBT","ZAL"),("ASV","CZV"),("KBA","DUB"),("MIL","RMB"),("BAR","MTA"),("PAR","PAO"),("VBC","OLY"),("HTA","BJK"),("EFS","BAY"),("PBB","VIR")],
+ 6: [("FBT","PAR"),("MIL","DUB"),("VBC","MTA"),("RMB","ASV"),
+            ("BJK","BAY"),("ZAL","EFS"),("CZV","PBB"),("PAO","HTA"),("BAR","OLY"),("VIR","KBA")],
 }
 OPP = {}
 for rn_, fx in ROUNDS.items():
@@ -24,7 +27,7 @@ for rn_, fx in ROUNDS.items():
         m[h] = (a, "H" if known else ""); m[a] = (h, "A" if known else "")
     assert len(m) == 20, "every team must appear exactly once per round"
     OPP[rn_] = m
-FIXTURE_TURNS = [1]*4 + [2]*6  # per FIXTURES entry: 4 games in Turn 1, 6 in Turn 2
+FIXTURE_TURNS = [1]*1 + [2]*6 + [3]*3  # per FIXTURES entry: 1 game in Turn 1, 6 in Turn 2, 3 in Turn 3
 NEXT = {}; TURN = {}
 for (h, a), t in zip(FIXTURES, FIXTURE_TURNS):
     NEXT[h] = (a, "H"); NEXT[a] = (h, "A"); TURN[h] = TURN[a] = t

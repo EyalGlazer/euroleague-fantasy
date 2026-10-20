@@ -121,11 +121,11 @@ function chart(p){
   bars+=`<rect x="${x(i)-bw/2}" y="${y}" width="${bw}" height="${base-y}" rx="2" fill="#e8eefc"/>
   <text x="${x(i)}" y="${y-3}" text-anchor="middle" style="fill:#fff">${h[0]}</text>`});
  // Price line
- const ps=H.filter(Boolean).map(h=>h[1]);let lo=Math.min(...ps),hi=Math.max(...ps);if(hi-lo<0.5){lo-=0.5;hi+=0.5}
+ const ps=H.filter(Boolean).map(h=>h[1]);if(!ps.length)ps.push(p.price);let lo=Math.min(...ps),hi=Math.max(...ps);if(hi-lo<0.5){lo-=0.5;hi+=0.5}
  const yp=v=>base-(v-lo)/(hi-lo)*ph;
  let line=axis(hi.toFixed(1),lo.toFixed(1));const pts=[];
  H.forEach((h,i)=>{if(h)pts.push([x(i),yp(h[1]),h[1]])});
- line+=`<polyline points="${pts.map(q=>q[0]+","+q[1]).join(" ")}" fill="none" stroke="#ff4d4d" stroke-width="2"/>`;
+ if(pts.length)line+=`<polyline points="${pts.map(q=>q[0]+","+q[1]).join(" ")}" fill="none" stroke="#ff4d4d" stroke-width="2"/>`;
  pts.forEach(q=>line+=`<circle cx="${q[0]}" cy="${q[1]}" r="3" fill="#ff4d4d"/><text x="${q[0]}" y="${q[1]-7}" text-anchor="middle" style="fill:#ffd0d0">${q[2]}</text>`);
  return `<h4>${p.name} <span style="color:var(--mut);font-weight:400">${p.team}</span></h4>
  <div class="charts"><div><div class="lg"><span><i style="background:#e8eefc"></i>FPT per round</span></div><svg width="${W}" height="${Ht}">${bars}</svg></div>
